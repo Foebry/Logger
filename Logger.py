@@ -1,4 +1,5 @@
 from datetime import datetime
+import datetime
 import time
 import os
 
@@ -6,41 +7,56 @@ import os
 class Logger:
 
     def __init__(self, loc, rot='h'):
-        logs = os.path.join(loc, 'Logs')
-        sql = os.path.join (logs, 'SQL')
-        debug = os.path.join(logs, 'Debug')
-        error = os.path.join(logs, 'Error')
+        self.path = os.path.join(loc, 'Logs')
+        self.rot = rot
 
-        if not os.path.exists(logs):
-            os.makedirs(logs)
-            os.makedirs(sql)
-            os.makedirs(debug)
-            os.makedirs(error)
+        if not os.path.exists(self.path):
+            os.makedirs('Logs')
 
-        else:
-            if not os.path.exists(sql): os.makedirs(sql)
-            if not os.path.exists(debug): os.makedirs(debug)
-            if not os.path.exists(error): os.makedirs(error)
-
-        rots = {
-            's': 1,
-            'm': 60,
-            'h': 3600,
-            'd': 86400,
-            'w': 604800
+        self.files = {
+            'SQL': None,
+            'Debug': None,
+            'Error': None
         }
-        self.rot = rots[rot]
 
+        self.timings = {
+            'SQL': None,
+            'Debug': None,
+            'Error': None
+        }
+
+        sql = f'{self.path}//SQL'
+        debug = f'{self.path}//Debug'
+        error = f'{self.path}//Error'
+
+        if os.path.exists(f'{self.path}//SQL') and len(os.listdir(sql)) >= 1: self.files['SQL'] = max(os.listdir(sql))
+        if os.path.exists(f'{self.path}//Debug') and len(os.listdir(debug)) >= 1: self.files['Debug'] = max(os.listdir(debug))
+        if os.path.exists(f'{self.path}//Error') and len(os.listdir(error)) >= 1: self.files['Error'] = max(os.listdir(error))
 
 
     def CreateNewFile(self, file):
-        pass
+        dir = os.path.join(self.path, file)
+        if not os.path.exists(dir): os.makedirs(dir)
 
-    def Error(self, msg):
-        pass
+        if self.rot == 'w': filename = f'Week {datetime.date(2021, 3, 5).strftime("%V")}.log'
+        elif self.rot == 'd': filename = f'{datetime.datetime.now().date()}.log'
+        elif self.rot == 'h': filename = f'{datetime.datetime.now().date()}_{datetime.datetime.now().hour}h.log'
+        elif self.rot == 'm': filename = f'{datetime.datetime.now().date()}_{datetime.datetime.now().hour}h_{datetime.datetime.now().minute}m.log'
+        elif self.rot == 's': filename = f'{datetime.datetime.now().date()}_{datetime.datetime.now().hour}h_{datetime.datetime.now().minute}m_{datetime.datetime.now().second}s.log'
 
-    def SQL(self, msg):
-        pass
+        self.files[file] = os.path.join(self.path, file, filename)
+        temp = open(self.files[file], 'a')
+        temp.close()
+        self.timings[file] = datetime.datetime.now()
 
-    def Debug(self, msg):
-        pass
+    def write(self, file, msg):
+        self.IsValidTimeFrame(file)
+        temp = open(self.files[file], 'a')
+        temp.write(f'{datetime.datetime.now()} - {msg}')
+        temp.close()
+
+    def IsValidTimeFrame(self, file):
+
+        if self.files[file] is None: self.CreateNewFile(file)
+        else:
+            pass
