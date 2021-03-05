@@ -50,19 +50,19 @@ class Logger:
         if self.entries['error'] + self.rot > datetime.now(): self.CreateNewFile('error')
 
         self.debug.open()
-        self.debug.write(msg)
+        self.debug.write(f'{datetime.now()} - {msg}')
         self.debug.close()
 
     def SQL(self, msg):
         if self.entries['sql'] + self.rot > datetime.now(): self.CreateNewFile('sql')
 
         self.sql.open()
-        self.sql.write(msg)
+        self.sql.write(f'{datetime.now()} - {msg}')
         self.sql.close()
 
     def Debug(self, msg):
         if self.entries['debug'] + self.rot > datetime.now(): self.CreateNewFile('debug')
 
         self.debug.open()
-        self.debug.write(msg)
+        self.debug.write(f'{datetime.now()} - {msg}')
         self.debug.close()
