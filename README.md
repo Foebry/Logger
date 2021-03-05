@@ -1,2 +1,0 @@
-# Logger
-Logger for logging
