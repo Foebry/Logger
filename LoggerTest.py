@@ -5,7 +5,7 @@ from Logger import Logger
 class LoggerTest(unittest.TestCase):
     def test_init(self):
         dir = os.getcwd()
-        logger = Logger(dir)
+        logger = Logger(dir, rot='m')
         #self.assertEqual("E://Projects//Python//Logger", logger.loc)
         return logger
 
