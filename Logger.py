@@ -51,9 +51,9 @@ class Logger:
 
     def write(self, file, msg):
         self.IsValidTimeFrame(file)
-        temp = open(self.files[file], 'a')
-        temp.write(f'{datetime.datetime.now()} - {msg}')
-        temp.close()
+        temp = open(os.path.join(self.path, file, self.files[file]), 'a')
+
+        temp.write(f'{datetime.datetime.now()} - {msg} \n')
 
     def IsValidTimeFrame(self, file):
 
