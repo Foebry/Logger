@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'logger',
-    version = 1.0,
+    version = 1.1,
     packages = [],
     url = "https://github.com/Foebry/Logger",
     licence = '',
