@@ -1,6 +1,7 @@
 from datetime import datetime
 import datetime
 import time
+
 import os
 
 
@@ -52,7 +53,12 @@ class Logger:
         self.timings[file] = datetime.datetime.now()
 
 
-    def write(self, file, msg):
+    def log(self, type, msg):
+        sql = ["mysql.connector.errors.ProgrammingError"]
+        error = ["KeyError"]
+        if type is None: file = "Debug"
+        elif type in sql": file = "Sql"
+        elif type in error: file = "Error"
         self.IsValidTimeFrame(file)
         temp = open(os.path.join(self.path, file, self.files[file]), 'a')
         temp.write(f'{datetime.datetime.now()} - {msg} \n')
