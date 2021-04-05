@@ -8,5 +8,5 @@ setup(
     licence = '',
     author = "Foebry",
     author_email = "rain_fabry@hotmail.com",
-    description = "Rotational logger for logging. Supports 5 levels Error, SQL, Debug, Info, Attention"
+    description = "Rotational logger for logging. Supports 5 levels Error, Database, Debug, Info, Warning"
 )
