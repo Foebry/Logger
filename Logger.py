@@ -16,31 +16,31 @@ class Logger:
         if not os.path.exists(self.path): os.makedirs(self.path)
 
         self.files = {
-            'SQL': None,
+            'Database': None,
             'Debug': None,
             'Error': None,
-            "Attention": None,
+            "Warning": None,
             "Info": None
         }
 
         self.timings = {
-            'SQL': None,
+            'Database': None,
             'Debug': None,
             'Error': None,
-            'Attention': None,
+            'Warning': None,
             'Info': None
         }
 
-        sql = f'{self.path}//SQL'
+        sql = f'{self.path}//Database'
         debug = f'{self.path}//Debug'
         error = f'{self.path}//Error'
-        attention = f'{self.path}//Attention'
+        attention = f'{self.path}//Warning'
         info = f'{self.path}//Info'
 
-        if os.path.exists(f'{self.path}//SQL') and len(os.listdir(sql)) >= 1: self.files['SQL'] = max(os.listdir(sql))
+        if os.path.exists(f'{self.path}//Database') and len(os.listdir(sql)) >= 1: self.files['Database'] = max(os.listdir(sql))
         if os.path.exists(f'{self.path}//Debug') and len(os.listdir(debug)) >= 1: self.files['Debug'] = max(os.listdir(debug))
         if os.path.exists(f'{self.path}//Error') and len(os.listdir(error)) >= 1: self.files['Error'] = max(os.listdir(error))
-        if os.path.exists(f'{self.path}//Attention') and len(os.listdir(attention)) >= 1: self.files['Attention'] = max(os.listdir(attention))
+        if os.path.exists(f'{self.path}//Warning') and len(os.listdir(warning)) >= 1: self.files['Warning'] = max(os.listdir(warning))
         if os.path.exists(f'{self.path}//Info') and len(os.listdir(info)) >= 1: self.files['Info'] = max(os.listdir(info))
 
 
@@ -63,46 +63,85 @@ class Logger:
         self.timings[file] = datetime.datetime.now()
 
 
-    def log(self, msg, type=None, timestamped=True):
+    def log(self, debug=False, msg=None, type=None, timestamped=True):
 
         allocation = {
             "Info": [None,],
-            "Debug": [UnboundLocalError,],
-            "SQL": [mysql.connector.errors.ProgrammingError,mysql.connector.errors.IntegrityError],
-            "Error": [KeyError]
+            "Database": [mysql.connector.errors.ProgrammingError,mysql.connector.errors.IntegrityError],
+            "Warning": [KeyError, UnboundLocalError]
         }
 
-        stars = {
-            "Info": "",
-            "Debug": "*"*100,
-            "SQL": "*"*100,
-            "Error": "*"*100
-        }
-
-        whitespaces = {
-            "Info": 0,
-            "Debug": 2,
-            "SQL": 3,
-            "Error": 2
-        }
-
-        level = "Attention"
+        level = "Warning"
 
         for key in allocation:
             if type in allocation[key]:
                 level = key
                 break
+            level = "Error"
+
+        if debug: level = "Debug"
 
         self.IsValidTimeFrame(level)
 
-        if level == "Attention":
+        if level == "Warning":
             msg += f" //  {str(type)}"
 
-        timing = f'{datetime.datetime.now()} - '
-        if not timestamped: timing = ""
+        if level == "Warning": self.warning(msg, type)
+        elif level == "Debug": self.debug(msg, type, timestamped)
+        elif level == "Info": self.info(msg, type, timestamped)
+        elif level == "Database": self.database(msg, type)
+        elif level == "Error": self.error(msg, type)
 
-        file = open(os.path.join(self.path, level, self.files[level]), 'a')
-        file.write("\n"*whitespaces[level] + f'{timing}{msg} \n' + stars[level])
+
+    def warning(msg, type):
+        time = f'{datetime.datetime.now()} - '
+
+        file = open(os.path.join(self.path, "Warning", self.files["Warning"]), 'a')
+        message = "\n"*2 + "WARNING:"+"%s%s"%(time, msg) + "*"*100
+
+        file.write(message)
+        file.close()
+
+
+    def debug(msg, type, timestamped):
+        time = ""
+        if timestamped: time = f'{datetime.datetime.now()} - '
+
+        file = open(os.path.join(self.path, "Debug", self.files["Debug"]), "a")
+        message = "\n"*2+"DEBUG:"+"%s%s"%(time, msg)+"*"*100
+
+        file.write(message)
+        file.close()
+
+
+    def Info(msg, type, timestamped):
+        time = ""
+        if timestamped: time = f'{datetime.datetime.now()} - '
+
+        file = open(os.path.join(self.path, "Info", self.files["Info"]), "a")
+        message = "INFO:"+"%s%s"%(time, msg)
+
+        file.write(message)
+        file.close()
+
+
+    def database(msg, type):
+        time = f'{datetime.datetime.now()} - '
+
+        file = open(os.path.join(self.path, "Database", self.files["Database"]), "a")
+        message = "\n"*2+"Database:" + "%s%s"%(time, msg)+"*"*100
+
+        file.write(message)
+        file.close()
+
+
+    def Error(msg, type):
+        time = f'{datetime.datetime.now()} - '
+
+        file = open(os.path.join(self.path, "Error", self.files["Error"]), "a")
+        message = "\n"*2+"ERROR: "+"%s%s"%(time, msg)+"*"*100
+
+        file.write(message)
         file.close()
 
 
