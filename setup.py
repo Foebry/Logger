@@ -56,7 +56,7 @@ test_requirements = [
 ]
 
 about = {}
-with open(os.path.join(here, 'requests', '__version__.py'), 'r', 'utf-8') as f:
+with open(os.path.join(here, 'Logger', '__version__.py'), 'r', 'utf-8') as f:
     exec(f.read(), about)
 
 with open('README.md', 'r', 'utf-8') as f:
