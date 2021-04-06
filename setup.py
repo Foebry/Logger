@@ -37,7 +37,7 @@ if sys.argv[-1] == 'publish':
     os.system('twine upload dist/*')
     sys.exit()
 
-packages = ['requests']
+packages = ['logger']
 
 requires = [
     'chardet>=3.0.2,<5',
@@ -73,7 +73,7 @@ setup(
     url=about['__url__'],
     packages=packages,
     package_data={'': ['LICENSE', 'NOTICE']},
-    package_dir={'requests': 'requests'},
+    package_dir={'logger': 'logger'},
     include_package_data=True,
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
     install_requires=requires,
