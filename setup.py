@@ -1,15 +1,13 @@
-#!/usr/bin/env python
-# Learn more: https://github.com/kennethreitz/setup.py
 import os
+import re
 import sys
 
 from codecs import open
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
 here = os.path.abspath(os.path.dirname(__file__))
-print(here)
 
 class PyTest(TestCommand):
     user_options = [('pytest-args=', 'a', "Arguments to pass into py.test")]
@@ -39,25 +37,47 @@ if sys.argv[-1] == 'publish':
     os.system('twine upload dist/*')
     sys.exit()
 
-packages = ['logger']
+packages = ['requests']
 
-requires = []
+requires = [
+    'chardet>=3.0.2,<5',
+    'idna>=2.5,<3',
+    'urllib3>=1.21.1,<1.27',
+    'certifi>=2017.4.17'
 
+]
+test_requirements = [
+    'pytest-httpbin==0.0.7',
+    'pytest-cov',
+    'pytest-mock',
+    'pytest-xdist',
+    'PySocks>=1.5.6, !=1.5.7',
+    'pytest>=3'
+]
+
+about = {}
+with open(os.path.join(here, 'requests', '__version__.py'), 'r', 'utf-8') as f:
+    exec(f.read(), about)
+
+with open('README.md', 'r', 'utf-8') as f:
+    readme = f.read()
 
 setup(
-    name="logger",
-    version='1.3',
-    long_description="",
-    author="Foebry",
-    author_email="rain_fabry@hotmail.Com",
-    url="https://github.com/Foebry/Logger",
-    packages=find_packages('src', exclude=['test']),
+    name=about['__title__'],
+    version=about['__version__'],
+    description=about['__description__'],
+    long_description=readme,
+    long_description_content_type='text/markdown',
+    author=about['__author__'],
+    author_email=about['__author_email__'],
+    url=about['__url__'],
+    packages=packages,
     package_data={'': ['LICENSE', 'NOTICE']},
-    package_dir={'logger': 'logger'},
+    package_dir={'requests': 'requests'},
     include_package_data=True,
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
     install_requires=requires,
-    license="",
+    license=about['__license__'],
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -77,13 +97,13 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
     cmdclass={'test': PyTest},
+    tests_require=test_requirements,
     extras_require={
         'security': ['pyOpenSSL >= 0.14', 'cryptography>=1.3.4'],
         'socks': ['PySocks>=1.5.6, !=1.5.7'],
         'socks:sys_platform == "win32" and python_version == "2.7"': ['win_inet_pton'],
     },
     project_urls={
-        'Documentation': 'https://requests.readthedocs.io',
-        'Source': 'https://github.com/psf/requests',
+        'Source': 'https://github.com/Foebry/Logger',
     },
 )
