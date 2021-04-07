@@ -37,7 +37,7 @@ if sys.argv[-1] == 'publish':
     os.system('twine upload dist/*')
     sys.exit()
 
-packages = ['logger']
+packages = ['logger', 'test']
 
 requires = []
 
