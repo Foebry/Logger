@@ -2,7 +2,6 @@ from datetime import datetime
 
 import datetime
 import time
-import mysql.connector
 import os
 
 
@@ -34,7 +33,7 @@ class Logger:
         sql = f'{self.path}//Database'
         debug = f'{self.path}//Debug'
         error = f'{self.path}//Error'
-        attention = f'{self.path}//Warning'
+        warning = f'{self.path}//Warning'
         info = f'{self.path}//Info'
 
         if os.path.exists(f'{self.path}//Database') and len(os.listdir(sql)) >= 1: self.files['Database'] = max(os.listdir(sql))
@@ -63,18 +62,25 @@ class Logger:
         self.timings[file] = datetime.datetime.now()
 
 
-    def log(self, debug=False, msg=None, type=None, timestamped=True):
+    def log(self, debug=False, msg=None, err=None, timestamped=True, level_display=True):
+        import mysql.connector
 
         allocation = {
             "Info": [None,],
-            "Database": [mysql.connector.errors.ProgrammingError,mysql.connector.errors.IntegrityError],
-            "Warning": [KeyError, UnboundLocalError]
+            "Database": [mysql.connector.errors.ProgrammingError,
+                         mysql.connector.errors.IntegrityError,
+                         mysql.connector.errors.OperationalError
+                         ],
+            "Warning": [KeyError,
+                        UnboundLocalError,
+                        ZeroDivisionError
+                        ]
         }
 
         level = "Warning"
 
         for key in allocation:
-            if type in allocation[key]:
+            if err in allocation[key]:
                 level = key
                 break
             level = "Error"
@@ -84,62 +90,72 @@ class Logger:
         self.IsValidTimeFrame(level)
 
         if level == "Warning":
-            msg += f" //  {str(type)}"
+            msg += f" //  {str(type(err))}"
 
-        if level == "Warning": self.warning(msg, type)
-        elif level == "Debug": self.debug(msg, type, timestamped)
-        elif level == "Info": self.info(msg, type, timestamped)
-        elif level == "Database": self.database(msg, type)
-        elif level == "Error": self.error(msg, type)
+        if level == "Warning": self.warning(msg, err, level_display)
+        elif level == "Debug": self.debug(msg, err, timestamped, level_display)
+        elif level == "Info": self.info(msg, err, timestamped, level_display)
+        elif level == "Database": self.database(msg, err, level_display)
+        elif level == "Error": self.error(msg, err, level_display)
 
 
-    def warning(msg, type):
+    def warning(self, msg, err, level_display):
         time = f'{datetime.datetime.now()} - '
+        level = "WARNING:"
+        if not level_display: level = ""
 
         file = open(os.path.join(self.path, "Warning", self.files["Warning"]), 'a')
-        message = "\n"*2 + "WARNING:"+"%s%s"%(time, msg) + "*"*100
+        message = "\n"*2 + "{} {}{}".format(level, time, msg) + "*"*100
 
         file.write(message)
         file.close()
 
 
-    def debug(msg, type, timestamped):
+    def debug(self, msg, err, timestamped, level_display):
         time = ""
         if timestamped: time = f'{datetime.datetime.now()} - '
+        level = "DEBUG:"
+        if not level_display: level = ""
 
         file = open(os.path.join(self.path, "Debug", self.files["Debug"]), "a")
-        message = "\n"*2+"DEBUG:"+"%s%s"%(time, msg)+"*"*100
+        message = "\n"*2+"{} {}{}".format(level, time, msg)+"*"*100
 
         file.write(message)
         file.close()
 
 
-    def Info(msg, type, timestamped):
+    def info(self, msg, err, timestamped, level_display):
         time = ""
         if timestamped: time = f'{datetime.datetime.now()} - '
+        level = "INFO:"
+        if not level_display: level = ""
 
         file = open(os.path.join(self.path, "Info", self.files["Info"]), "a")
-        message = "INFO:"+"%s%s"%(time, msg)
+        message = "\n" +"{} {}{}".format(level, time, msg)
 
         file.write(message)
         file.close()
 
 
-    def database(msg, type):
+    def database(self, msg, err, level_display):
         time = f'{datetime.datetime.now()} - '
+        level = "DATABASE:"
+        if not level_display: level = ""
 
         file = open(os.path.join(self.path, "Database", self.files["Database"]), "a")
-        message = "\n"*2+"Database:" + "%s%s"%(time, msg)+"*"*100
+        message = "\n"*2+"{} {}{}".format(level, time, msg)+"\n"+"*"*100
 
         file.write(message)
         file.close()
 
 
-    def Error(msg, type):
+    def error(self, msg, err, level_display):
         time = f'{datetime.datetime.now()} - '
+        level = "ERROR:"
+        if not level_display: level = ""
 
         file = open(os.path.join(self.path, "Error", self.files["Error"]), "a")
-        message = "\n"*2+"ERROR: "+"%s%s"%(time, msg)+"*"*100
+        message = "\n"*2+"{} {}{}".format(level, time, msg)+"*"*100
 
         file.write(message)
         file.close()
